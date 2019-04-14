@@ -13,8 +13,8 @@ from json.decoder import JSONDecodeError    # 捕获json.decoder错误
 
 
 # 获取翻译后的结果
-def fanYi():
-    global result, var
+def fanYi(event):
+    global result, var, path
     try:
         entry2.delete(0, 'end')
         var = entry1.get()
@@ -37,6 +37,8 @@ def fanYi():
         res = requests.post(
             'http://fanyi.youdao.com/translate?smartresult=dict&smartresult=rule', data)
         result = res.json()['translateResult'][0][0]['tgt']
+        name = os.environ['USERNAME']
+        path = r"C:/Users/" + name + "/AppData/Local/Temp/"
     except JSONDecodeError:
         messagebox.showwarning(title="warning", message="翻译内容为空，请输入后重试")
     else:
@@ -59,15 +61,15 @@ def say1():
             'per': 4
         })
         # 写入文件
-        if not os.path.exists(r'C:/Temp/'):
-            os.mkdir(r'C:/Temp/')
-        with open(r'C:/Temp/data.mp3', 'wb+') as ff:
+        if not os.path.exists(path):
+            os.mkdir(path)
+        with open(path + "data.mp3", 'wb+') as ff:
             ff.write(effect_data)
         # 获取mp3时长
-        audio = MP3(r'C:/Temp/data.mp3')
+        audio = MP3(path + "data.mp3")
         mp3_lenth = audio.info.length
         # 播放语音1
-        song = minimu.load(r'C:/Temp/data.mp3')
+        song = minimu.load(path + "data.mp3")
         song.play()
         time.sleep(mp3_lenth)
         song.stop()
@@ -93,15 +95,15 @@ def say2():
             'per': 4
         })
         # 写入文件
-        if not os.path.exists(r'C:/Temp/'):
-            os.mkdir(r'C:/Temp/')
-        with open(r'C:/Temp/data.mp3', 'wb+') as ff:
+        if not os.path.exists(path):
+            os.mkdir(path)
+        with open(path+"data.mp3", 'wb+') as ff:
             ff.write(effect_data)
         # 获取mp3时长
-        audio = MP3(r'C:/Temp/data.mp3')
+        audio = MP3(path+"data.mp3")
         mp3_lenth = audio.info.length
         # 播放语音2
-        song = minimu.load(r'C:/Temp/data.mp3')
+        song = minimu.load(path+"data.mp3")
         song.play()
         time.sleep(mp3_lenth)
         song.stop()
@@ -145,32 +147,13 @@ entry2 = Entry(root, fg='red', font=('GB2312', 18))
 entry2.grid(row=1, column=1, pady=10)
 
 # 设置按钮
-button1 = Button(
-    root,
-    text='翻译',
-    fg='blue',
-    font=(
-        'GB2312',
-        18),
-    command=fanYi)
+root.bind('<Return>', fanYi)        # 绑定回车键
+button1 = Button(root, text='翻译', fg='blue', font=('GB2312', 18))
+button1.bind('<Button-1>', fanYi)   # 绑定按钮
 button1.grid(row=2, column=0)
-button2 = Button(
-    root,
-    text='清空',
-    fg='blue',
-    font=(
-        'GB2312',
-        18),
-    command=clean)
+button2 = Button(root, text='清空', fg='blue', font=('GB2312', 18), command=clean)
 button2.grid(row=2, column=1)
-button3 = Button(
-    root,
-    text='退出',
-    fg='blue',
-    font=(
-        'GB2312',
-        18),
-    command=root.quit)
+button3 = Button(root, text='退出', fg='blue', font=('GB2312', 18), command=root.quit)
 button3.grid(row=2, column=2)
 button4 = Button(root, text='发音1', image=img_png, command=say1)
 button4.grid(row=0, column=2)
